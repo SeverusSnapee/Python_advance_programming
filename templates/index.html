@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Map with Housing and Loan Data</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
+    />
+    <style>
+      #map {
+        height: 800px; /* Adjust the map height as needed */
+      }
+    </style>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Data from Flask
+        var housingData = {{ housing_data | tojson | safe }};
+        var loanData = {{ loan_data | tojson | safe }};
+
+        // Initialize the map centered on Germany
+        var map = L.map('map').setView([51.1657, 10.4515], 6); // Centered on Germany, zoom level 6
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Initialize the MarkerClusterGroup layers
+        var housingMarkers = L.markerClusterGroup();
+        var loanMarkers = L.markerClusterGroup();
+
+        // Add housing markers to the MarkerClusterGroup layer
+        housingData.forEach(function(point) {
+          var marker = L.marker([point.latitude, point.longitude], {
+            icon: L.icon({
+              iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              shadowSize: [41, 41]
+            })
+          });
+          marker.bindPopup(`
+            <b>Median Age:</b> ${point.housing_median_age}<br>
+            <b>Total Rooms:</b> ${point.total_rooms}<br>
+            <b>Total Bedrooms:</b> ${point.total_bedrooms}<br>
+            <b>Population:</b> ${point.population}<br>
+            <b>Households:</b> ${point.households}<br>
+            <b>Median Income:</b> ${point.median_income}<br>
+            <b>Median House Value:</b> ${point.median_house_value}<br>
+            <b>Ocean Proximity:</b> ${point.ocean_proximity}
+          `);
+          housingMarkers.addLayer(marker);
+        });
+
+        // Add loan markers to the MarkerClusterGroup layer
+        loanData.forEach(function(point) {
+          var marker = L.marker([point.latitude, point.longitude], {
+            icon: L.icon({
+              iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+              iconSize: [25, 71],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              shadowSize: [41, 41]
+            })
+          });
+          marker.bindPopup(`
+            <b>Interest Rate:</b> ${point.interest_rate}%<br>
+            <b>Loan Type:</b> ${point.loan_type}<br>
+            <b>Loan Duration:</b> ${point.loan_duration_months} months<br>
+            <b>Loan Amount:</b> €${point.loan_amount_eur}
+          `);
+          loanMarkers.addLayer(marker);
+        });
+
+        // Add the MarkerClusterGroup layers to the map
+        map.addLayer(housingMarkers);
+        map.addLayer(loanMarkers);
+      });
+    </script>
+  </body>
+</html>
