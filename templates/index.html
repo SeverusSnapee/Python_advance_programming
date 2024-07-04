@@ -16,12 +16,60 @@
       #map {
         height: 800px; /* Adjust the map height as needed */
       }
+      .legend {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        font-family: Arial, sans-serif;
+      }
+      .legend-item {
+        margin-bottom: 8px;
+      }
+      .legend .housing-marker {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        background-color: blue;
+        margin-right: 5px;
+        border: 1px solid #ccc;
+      }
+      .legend .loan-marker {
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        background-color: red;
+        margin-right: 5px;
+        border: 1px solid #ccc;
+      }
     </style>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </head>
   <body>
+    <h1 style="text-align: center">Map with Housing and Loan Data</h1>
+    <h4 style="text-align: center">
+      Red Markers shows the loan rate of that state and blue markers show
+      different houses with their details
+    </h4>
     <div id="map"></div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="housing-marker"></div>
+        Housing Data (Blue Markers)
+      </div>
+      <div class="legend-item">
+        <div class="loan-marker"></div>
+        Loan Data (Red Markers)
+      </div>
+    </div>
+
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         // Data from Flask
